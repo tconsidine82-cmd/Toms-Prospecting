@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APEX — Box Sales Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f4f6fb;
+  --sidebar-bg: #0f1623;
+  --surface: #ffffff;
+  --surface2: #f8faff;
+  --border: #e4e8f0;
+  --accent: #0061d5;
+  --accent-light: #e8f0fe;
+  --accent2: #00c4a0;
+  --accent2-light: #e6faf7;
+  --orange: #ff6b35;
+  --orange-light: #fff1ec;
+  --red: #e53e3e;
+  --red-light: #fff5f5;
+  --text: #1a2035;
+  --text2: #4a5568;
+  --muted: #9aa5b8;
+  --success: #00c4a0;
+  --sidebar-text: #8896b3;
+  --sidebar-active: #ffffff;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  overflow: hidden;
+  height: 100vh;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: 260px;
+  min-width: 260px;
+  background: var(--sidebar-bg);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.sidebar-logo {
+  padding: 24px 20px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.logo-mark {
+  font-family: 'Manrope', sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  color: white;
+  letter-spacing: -0.5px;
+}
+.logo-mark span { color: #0061d5; }
+.logo-sub { font-size: 11px; color: var(--sidebar-text); margin-top: 3px; letter-spacing: 0.05em; }
+
+.sidebar-section { padding: 20px 16px 8px; }
+.sidebar-section-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sidebar-text);
+  margin-bottom: 10px;
+  padding: 0 4px;
+}
+
+.search-wrap { padding: 0 16px 16px; }
+.search-input-wrap { position: relative; }
+.search-input-wrap input {
+  width: 100%;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 10px 14px 10px 36px;
+  color: white;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  outline: none;
+  transition: all 0.2s;
+}
+.search-input-wrap input:focus { border-color: var(--accent); background: rgba(0,97,213,0.15); }
+.search-input-wrap input::placeholder { color: var(--sidebar-text); }
+.search-input-wrap .s-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--sidebar-text); font-size: 15px; }
+
+.search-go-btn {
+  width: 100%;
+  margin-top: 8px;
+  padding: 11px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.search-go-btn:hover { background: #0052b8; }
+.search-go-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Source toggles */
+.source-list { display: flex; flex-direction: column; gap: 6px; padding: 0 16px; }
+.source-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s;
+  user-select: none;
+}
+.source-item:hover { background: rgba(255,255,255,0.05); }
+.source-item.active { background: rgba(0,97,213,0.15); }
+.source-left { display: flex; align-items: center; gap: 10px; }
+.source-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--sidebar-text); transition: background 0.2s; }
+.source-item.active .source-dot { background: var(--accent); box-shadow: 0 0 6px rgba(0,97,213,0.6); }
+.source-name { font-size: 12px; color: var(--sidebar-text); }
+.source-item.active .source-name { color: white; }
+.source-check { font-size: 14px; opacity: 0; transition: opacity 0.2s; }
+.source-item.active .source-check { opacity: 1; color: var(--accent); }
+
+/* Recent accounts */
+.recent-list { display: flex; flex-direction: column; gap: 4px; padding: 0 16px; }
+.recent-item {
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--sidebar-text);
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.recent-item:hover { background: rgba(255,255,255,0.06); color: white; }
+.recent-icon { font-size: 13px; }
+
+/* Key indicator */
+.key-btn {
+  margin: auto 16px 16px;
+  padding: 9px 12px;
+  background: rgba(0,196,160,0.12);
+  border: 1px solid rgba(0,196,160,0.2);
+  border-radius: 8px;
+  font-size: 11px;
+  color: var(--accent2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.15s;
+}
+.key-btn:hover { background: rgba(0,196,160,0.2); }
+.key-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent2); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+/* ── MAIN AREA ── */
+.main-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Top bar */
+.topbar {
+  background: white;
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.topbar-company { font-family: 'Manrope', sans-serif; font-size: 18px; font-weight: 800; color: var(--text); }
+.topbar-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+
+.score-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+}
+.score-badge.high { background: var(--accent2-light); color: var(--accent2); }
+.score-badge.med { background: var(--accent-light); color: var(--accent); }
+.score-badge.low { background: var(--orange-light); color: var(--orange); }
+
+/* Tab nav */
+.tab-nav {
+  background: white;
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  display: flex;
+  gap: 0;
+  flex-shrink: 0;
+}
+
+.tab-btn {
+  padding: 13px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.tab-btn:hover { color: var(--text); }
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+
+/* Content scroll area */
+.content-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 28px 32px;
+}
+
+/* ── EMPTY STATE ── */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 16px;
+  text-align: center;
+}
+.empty-icon { font-size: 56px; opacity: 0.2; }
+.empty-title { font-family: 'Manrope', sans-serif; font-size: 24px; font-weight: 700; color: var(--text2); }
+.empty-sub { font-size: 14px; color: var(--muted); max-width: 400px; line-height: 1.7; }
+.quick-chips { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 8px; }
+.chip { padding: 7px 16px; background: white; border: 1.5px solid var(--border); border-radius: 20px; font-size: 13px; color: var(--text2); cursor: pointer; transition: all 0.15s; font-weight: 500; }
+.chip:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ── LOADING ── */
+.loading-state {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 20px;
+}
+.loading-state.active { display: flex; }
+.spinner { width: 44px; height: 44px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-label { font-size: 14px; font-weight: 600; color: var(--text2); }
+.loading-steps { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+.lstep { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 8px; transition: color 0.3s; }
+.lstep.active { color: var(--text); }
+.lstep.done { color: var(--success); }
+.lstep-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); flex-shrink: 0; transition: background 0.3s; }
+.lstep.active .lstep-dot { background: var(--accent); }
+.lstep.done .lstep-dot { background: var(--success); }
+
+/* ── ERROR ── */
+.error-bar { display: none; background: var(--red-light); border: 1px solid #fed7d7; border-radius: 10px; padding: 14px 18px; color: var(--red); font-size: 13px; margin-bottom: 16px; }
+.error-bar.visible { display: block; }
+
+/* ── TAB PANELS ── */
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ── CARDS ── */
+.card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 22px 24px;
+}
+.card-title {
+  font-family: 'Manrope', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card-title-dot { width: 3px; height: 14px; border-radius: 2px; background: var(--accent); }
+
+/* Grid layouts */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
+.col-span-2 { grid-column: span 2; }
+.col-span-full { grid-column: 1 / -1; }
+
+/* ── STAT CARDS ── */
+.stat-card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+}
+.stat-val { font-family: 'Manrope', sans-serif; font-size: 24px; font-weight: 800; color: var(--text); line-height: 1; }
+.stat-lbl { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; margin-top: 6px; }
+.stat-chg { font-size: 12px; margin-top: 6px; font-weight: 600; }
+.stat-chg.up { color: var(--success); }
+.stat-chg.down { color: var(--red); }
+
+/* ── PEOPLE ── */
+.person-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.person-row:last-child { border-bottom: none; padding-bottom: 0; }
+.avatar {
+  width: 40px; height: 40px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 13px;
+  color: white; flex-shrink: 0;
+}
+.person-name-text { font-size: 14px; font-weight: 600; color: var(--text); }
+.person-title-text { font-size: 12px; color: var(--muted); margin-top: 1px; }
+.person-hook { font-size: 11px; color: var(--accent); margin-top: 3px; }
+.person-actions { margin-left: auto; display: flex; gap: 6px; }
+.icon-btn {
+  width: 30px; height: 30px;
+  background: var(--surface2); border: 1px solid var(--border); border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 12px; font-weight: 700; color: var(--text2);
+  transition: all 0.15s;
+}
+.icon-btn:hover { background: var(--accent-light); border-color: var(--accent); color: var(--accent); }
+
+/* Avatar colors */
+.av-blue { background: #3b82f6; }
+.av-purple { background: #8b5cf6; }
+.av-green { background: #10b981; }
+.av-orange { background: #f59e0b; }
+.av-pink { background: #ec4899; }
+.av-teal { background: #14b8a6; }
+
+/* ── NEWS ── */
+.news-row {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+.news-row:last-child { border-bottom: none; padding-bottom: 0; }
+.news-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 6px; }
+.news-headline { font-size: 14px; font-weight: 500; color: var(--text); line-height: 1.5; }
+.news-relevance { font-size: 12px; color: var(--accent); line-height: 1.5; margin-top: 4px; }
+.news-meta-row { font-size: 11px; color: var(--muted); margin-top: 6px; display: flex; gap: 12px; }
+.badge {
+  padding: 3px 10px; border-radius: 5px; font-size: 10px; font-weight: 700;
+  letter-spacing: 0.07em; text-transform: uppercase; white-space: nowrap; flex-shrink: 0;
+}
+.badge-trigger { background: var(--accent-light); color: var(--accent); }
+.badge-growth { background: var(--accent2-light); color: var(--accent2); }
+.badge-risk { background: var(--red-light); color: var(--red); }
+.badge-neutral { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+
+/* ── CHARTS ── */
+.chart-bar-row { margin-bottom: 16px; }
+.chart-bar-top { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px; }
+.chart-bar-top .lbl { color: var(--text2); font-weight: 500; }
+.chart-bar-top .val { color: var(--text); font-weight: 700; }
+.bar-track { height: 8px; background: var(--surface2); border-radius: 4px; overflow: hidden; border: 1px solid var(--border); }
+.bar-fill { height: 100%; border-radius: 4px; transition: width 1.2s cubic-bezier(0.4,0,0.2,1); background: linear-gradient(90deg, var(--accent), #4f9cf9); }
+.bar-fill.green { background: linear-gradient(90deg, var(--accent2), #4ade80); }
+.bar-fill.orange { background: linear-gradient(90deg, var(--orange), #fbbf24); }
+
+/* Mini donut chart */
+.donut-wrap { display: flex; align-items: center; gap: 20px; }
+.donut-svg { flex-shrink: 0; }
+.donut-legend { display: flex; flex-direction: column; gap: 8px; }
+.legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+/* ── PAIN POINTS ── */
+.pain-item {
+  display: flex; gap: 14px; padding: 14px;
+  background: var(--surface2); border-radius: 10px;
+  border-left: 3px solid var(--orange);
+  margin-bottom: 10px;
+}
+.pain-item:last-child { margin-bottom: 0; }
+.pain-num { font-family: 'Manrope', sans-serif; font-size: 22px; font-weight: 800; color: var(--border); line-height: 1; flex-shrink: 0; }
+.pain-text { font-size: 13px; line-height: 1.7; color: var(--text); }
+.pain-src { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+/* ── 10-K GRID ── */
+.tenk-item { background: var(--surface2); border-radius: 10px; padding: 16px; border: 1px solid var(--border); }
+.tenk-cat { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 8px; }
+.tenk-text { font-size: 13px; line-height: 1.7; color: var(--text2); font-style: italic; }
+
+/* ── BOX OPPORTUNITY ── */
+.opp-score-big {
+  text-align: center; padding: 32px;
+  background: linear-gradient(135deg, #0061d5 0%, #004aad 100%);
+  border-radius: 14px; color: white; margin-bottom: 16px;
+}
+.opp-score-num { font-family: 'Manrope', sans-serif; font-size: 72px; font-weight: 800; line-height: 1; }
+.opp-score-lbl { font-size: 13px; opacity: 0.75; margin-top: 6px; letter-spacing: 0.08em; text-transform: uppercase; }
+.opp-reason-item { display: flex; gap: 12px; padding: 14px; background: white; border-radius: 10px; border: 1px solid var(--border); margin-bottom: 10px; }
+.opp-reason-item:last-child { margin-bottom: 0; }
+.opp-arrow { color: var(--accent); font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+.opp-reason-text { font-size: 13px; line-height: 1.7; color: var(--text2); }
+
+/* ── AI CHAT PANEL ── */
+.chat-panel {
+  display: flex; flex-direction: column; height: 100%;
+  background: white; border-radius: 14px; border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.chat-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface2);
+  display: flex; align-items: center; gap: 12px;
+}
+.chat-ai-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent2); animation: pulse 2s infinite; }
+.chat-header-title { font-family: 'Manrope', sans-serif; font-size: 14px; font-weight: 700; }
+.chat-header-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+.chat-messages {
+  flex: 1; overflow-y: auto; padding: 20px;
+  display: flex; flex-direction: column; gap: 14px;
+  min-height: 0;
+}
+
+.msg { display: flex; gap: 10px; align-items: flex-start; }
+.msg.user { flex-direction: row-reverse; }
+.msg-avatar {
+  width: 30px; height: 30px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; flex-shrink: 0;
+}
+.msg-avatar.ai { background: var(--accent-light); color: var(--accent); }
+.msg-avatar.user-av { background: var(--accent); color: white; }
+.msg-bubble {
+  max-width: 78%; padding: 12px 15px; border-radius: 12px;
+  font-size: 13px; line-height: 1.7; color: var(--text);
+}
+.msg.ai .msg-bubble { background: var(--surface2); border: 1px solid var(--border); border-top-left-radius: 3px; }
+.msg.user .msg-bubble { background: var(--accent); color: white; border-top-right-radius: 3px; }
+.msg-bubble.typing { display: flex; gap: 4px; align-items: center; padding: 14px 18px; }
+.typing-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); animation: tdot 1.2s infinite; }
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes tdot { 0%,80%,100%{transform:scale(0.8);opacity:0.5} 40%{transform:scale(1.1);opacity:1} }
+
+.chat-quick-btns {
+  padding: 10px 20px;
+  display: flex; gap: 6px; flex-wrap: wrap;
+  border-top: 1px solid var(--border);
+}
+.quick-btn {
+  padding: 6px 12px; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 20px; font-size: 11px; font-weight: 500; color: var(--text2);
+  cursor: pointer; transition: all 0.15s; white-space: nowrap;
+}
+.quick-btn:hover { background: var(--accent-light); border-color: var(--accent); color: var(--accent); }
+
+.chat-input-row {
+  padding: 14px 16px;
+  border-top: 1px solid var(--border);
+  display: flex; gap: 8px;
+}
+.chat-input {
+  flex: 1; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 10px 14px;
+  font-family: 'Inter', sans-serif; font-size: 13px; color: var(--text);
+  outline: none; resize: none; transition: border-color 0.2s;
+  min-height: 40px; max-height: 100px;
+}
+.chat-input:focus { border-color: var(--accent); }
+.chat-input::placeholder { color: var(--muted); }
+.chat-send-btn {
+  width: 40px; height: 40px; background: var(--accent); border: none; border-radius: 10px;
+  color: white; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-size: 16px; transition: background 0.15s; flex-shrink: 0;
+}
+.chat-send-btn:hover { background: #0052b8; }
+.chat-send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── ASK TAB LAYOUT ── */
+.ask-layout { display: grid; grid-template-columns: 1fr 340px; gap: 16px; height: calc(100vh - 180px); }
+.ask-left { display: flex; flex-direction: column; gap: 16px; overflow-y: auto; }
+
+/* ── MODAL ── */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(15,22,35,0.85); backdrop-filter: blur(8px);
+  z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 24px;
+}
+.modal-box {
+  background: white; border-radius: 20px; padding: 40px;
+  max-width: 460px; width: 100%; box-shadow: 0 32px 80px rgba(0,0,0,0.25);
+}
+.modal-logo { font-family: 'Manrope', sans-serif; font-size: 26px; font-weight: 800; color: var(--text); margin-bottom: 6px; }
+.modal-logo span { color: var(--accent); }
+.modal-sub { font-size: 14px; color: var(--text2); line-height: 1.7; margin-bottom: 28px; }
+.modal-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 8px; }
+.modal-inp {
+  width: 100%; background: var(--surface2); border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 13px 16px; color: var(--text);
+  font-family: 'Inter', sans-serif; font-size: 13px; outline: none; transition: border-color 0.2s;
+  margin-bottom: 10px;
+}
+.modal-inp:focus { border-color: var(--accent); }
+.modal-inp::placeholder { color: var(--muted); }
+.modal-btn {
+  width: 100%; padding: 14px; background: var(--accent); color: white; border: none;
+  border-radius: 10px; font-family: 'Manrope', sans-serif; font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: background 0.2s; margin-top: 6px;
+}
+.modal-btn:hover { background: #0052b8; }
+.modal-err { background: var(--red-light); border: 1px solid #fed7d7; border-radius: 8px; padding: 10px 14px; color: var(--red); font-size: 12px; margin-bottom: 10px; display: none; }
+.modal-err.visible { display: block; }
+.modal-help { font-size: 12px; color: var(--muted); margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); line-height: 1.8; }
+.modal-help a { color: var(--accent); text-decoration: none; }
+
+/* Scrollbars */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* Utility */
+.mb-16 { margin-bottom: 16px; }
+.mt-16 { margin-top: 16px; }
+</style>
+</head>
+<body>
+
+<!-- API KEY MODAL -->
+<div class="modal-overlay" id="apiModal">
+  <div class="modal-box">
+    <div class="modal-logo">APE<span>X</span></div>
+    <div class="modal-sub">Enter your Anthropic API key to activate your Box Sales Intelligence Platform. Your key stays in your browser — never stored anywhere else.</div>
+    <div class="modal-label">Anthropic API Key</div>
+    <div class="modal-err" id="modalErr"></div>
+    <input class="modal-inp" type="password" id="apiKeyInp" placeholder="sk-ant-api03-..." />
+    <button class="modal-btn" onclick="saveKey()">Activate Dashboard →</button>
+    <div class="modal-help">
+      <strong style="color:var(--text)">Need a key?</strong><br>
+      1. Go to <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a><br>
+      2. Sign up → add billing → click "API Keys" → "Create Key"<br>
+      3. Copy the key (starts with sk-ant-) and paste above<br>
+      Cost: ~$0.02 per company search
+    </div>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">APE<span>X</span></div>
+    <div class="logo-sub">BOX SALES INTELLIGENCE</div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Search Account</div>
+  </div>
+  <div class="search-wrap">
+    <div class="search-input-wrap">
+      <span class="s-icon">⌕</span>
+      <input type="text" id="companyInput" placeholder="Company name..." />
+    </div>
+    <button class="search-go-btn" id="searchBtn" onclick="runSearch()">
+      <span>Analyze Account</span> <span>→</span>
+    </button>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Data Sources</div>
+  </div>
+  <div class="source-list" id="sourceList">
+    <div class="source-item active" data-source="linkedin" onclick="toggleSource(this)">
+      <div class="source-left">
+        <div class="source-dot"></div>
+        <span class="source-name">LinkedIn / Sales Nav</span>
+      </div>
+      <span class="source-check">✓</span>
+    </div>
+    <div class="source-item active" data-source="news" onclick="toggleSource(this)">
+      <div class="source-left">
+        <div class="source-dot"></div>
+        <span class="source-name">News & Web Search</span>
+      </div>
+      <span class="source-check">✓</span>
+    </div>
+    <div class="source-item active" data-source="financial" onclick="toggleSource(this)">
+      <div class="source-left">
+        <div class="source-dot"></div>
+        <span class="source-name">Financials / Crunchbase</span>
+      </div>
+      <span class="source-check">✓</span>
+    </div>
+    <div class="source-item active" data-source="tenk" onclick="toggleSource(this)">
+      <div class="source-left">
+        <div class="source-dot"></div>
+        <span class="source-name">SEC 10-K Filings</span>
+      </div>
+      <span class="source-check">✓</span>
+    </div>
+  </div>
+
+  <div class="sidebar-section" style="margin-top:8px;">
+    <div class="sidebar-section-label">Recent Accounts</div>
+  </div>
+  <div class="recent-list" id="recentList">
+    <div class="recent-item" onclick="loadExample('Salesforce')"><span class="recent-icon">🏢</span>Salesforce</div>
+    <div class="recent-item" onclick="loadExample('Microsoft')"><span class="recent-icon">🏢</span>Microsoft</div>
+    <div class="recent-item" onclick="loadExample('ServiceNow')"><span class="recent-icon">🏢</span>ServiceNow</div>
+  </div>
+
+  <div style="flex:1"></div>
+  <div class="key-btn" onclick="changeKey()">
+    <div class="key-dot"></div>
+    <span>API Key Active · Click to change</span>
+  </div>
+</nav>
+
+<!-- MAIN AREA -->
+<div class="main-area">
+
+  <!-- Top bar (hidden until results) -->
+  <div class="topbar" id="topbar" style="display:none">
+    <div>
+      <div class="topbar-company" id="topbarName">—</div>
+      <div class="topbar-meta" id="topbarMeta">—</div>
+    </div>
+    <div class="topbar-right">
+      <div class="score-badge" id="scoreBadge">—</div>
+    </div>
+  </div>
+
+  <!-- Tab nav (hidden until results) -->
+  <div class="tab-nav" id="tabNav" style="display:none">
+    <div class="tab-btn active" onclick="switchTab('overview',this)">📊 Overview</div>
+    <div class="tab-btn" onclick="switchTab('people',this)">👤 People</div>
+    <div class="tab-btn" onclick="switchTab('news',this)">📰 News & Triggers</div>
+    <div class="tab-btn" onclick="switchTab('financials',this)">💰 Financials</div>
+    <div class="tab-btn" onclick="switchTab('tenk',this)">📋 10-K Intel</div>
+    <div class="tab-btn" onclick="switchTab('ask',this)">💬 Ask AI</div>
+  </div>
+
+  <!-- Content area -->
+  <div class="content-area" id="contentArea">
+
+    <!-- Empty state -->
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">◎</div>
+      <div class="empty-title">Search any company to begin</div>
+      <div class="empty-sub">Get instant AI-powered intelligence across LinkedIn, news, financials, and SEC filings — tailored for Box Enterprise sales.</div>
+      <div class="quick-chips">
+        <div class="chip" onclick="loadExample('Salesforce')">Salesforce</div>
+        <div class="chip" onclick="loadExample('JPMorgan Chase')">JPMorgan Chase</div>
+        <div class="chip" onclick="loadExample('Pfizer')">Pfizer</div>
+        <div class="chip" onclick="loadExample('General Motors')">General Motors</div>
+        <div class="chip" onclick="loadExample('Deloitte')">Deloitte</div>
+      </div>
+    </div>
+
+    <!-- Loading state -->
+    <div class="loading-state" id="loadingState">
+      <div class="spinner"></div>
+      <div class="loading-label">Analyzing Account...</div>
+      <div class="loading-steps">
+        <div class="lstep" id="ls1"><div class="lstep-dot"></div>Searching LinkedIn profiles...</div>
+        <div class="lstep" id="ls2"><div class="lstep-dot"></div>Scanning news & trigger events...</div>
+        <div class="lstep" id="ls3"><div class="lstep-dot"></div>Pulling financial data...</div>
+        <div class="lstep" id="ls4"><div class="lstep-dot"></div>Parsing SEC 10-K filings...</div>
+        <div class="lstep" id="ls5"><div class="lstep-dot"></div>Building Box opportunity brief...</div>
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div class="error-bar" id="errorBar"></div>
+
+    <!-- Results panels -->
+    <div id="resultPanels" style="display:none">
+
+      <!-- OVERVIEW TAB -->
+      <div class="tab-panel active" id="panel-overview">
+        <div class="grid-4 mb-16" id="statsRow"></div>
+        <div class="grid-2" id="overviewGrid"></div>
+      </div>
+
+      <!-- PEOPLE TAB -->
+      <div class="tab-panel" id="panel-people">
+        <div class="card" id="peopleCard">
+          <div class="card-title"><div class="card-title-dot"></div>Key Decision Makers</div>
+          <div id="peopleList"></div>
+        </div>
+      </div>
+
+      <!-- NEWS TAB -->
+      <div class="tab-panel" id="panel-news">
+        <div class="card" id="newsCard">
+          <div class="card-title"><div class="card-title-dot"></div>News & Sales Trigger Events</div>
+          <div id="newsList"></div>
+        </div>
+      </div>
+
+      <!-- FINANCIALS TAB -->
+      <div class="tab-panel" id="panel-financials">
+        <div class="grid-2" id="finGrid"></div>
+      </div>
+
+      <!-- 10-K TAB -->
+      <div class="tab-panel" id="panel-tenk">
+        <div class="card">
+          <div class="card-title"><div class="card-title-dot"></div>SEC 10-K Intelligence</div>
+          <div class="grid-2" id="tenkGrid" style="margin-top:0"></div>
+        </div>
+      </div>
+
+      <!-- ASK AI TAB -->
+      <div class="tab-panel" id="panel-ask">
+        <div class="ask-layout">
+          <div class="ask-left">
+            <!-- Quick actions -->
+            <div class="card">
+              <div class="card-title"><div class="card-title-dot"></div>Box Opportunity Analysis</div>
+              <div id="boxOppContent"></div>
+            </div>
+          </div>
+          <!-- Chat panel -->
+          <div class="chat-panel">
+            <div class="chat-header">
+              <div class="chat-ai-dot"></div>
+              <div>
+                <div class="chat-header-title">Ask About This Account</div>
+                <div class="chat-header-sub">Powered by Claude AI · Box-focused</div>
+              </div>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+              <div class="msg ai">
+                <div class="msg-avatar ai">AI</div>
+                <div class="msg-bubble">Hi! I have all the intel on this account loaded. Ask me anything — like why they need Box, who to contact first, or generate a cold email. What would you like to know?</div>
+              </div>
+            </div>
+            <div class="chat-quick-btns" id="chatQuickBtns">
+              <div class="quick-btn" onclick="askQuick('Why does this company need Box?')">Why do they need Box?</div>
+              <div class="quick-btn" onclick="askQuick('Write a personalized cold email for Box Enterprise')">Write cold email</div>
+              <div class="quick-btn" onclick="askQuick('Give me 5 talking points for a discovery call')">Call talking points</div>
+              <div class="quick-btn" onclick="askQuick('Who is the best person to contact first and why?')">Who to contact?</div>
+              <div class="quick-btn" onclick="askQuick('What objections might they raise and how do I handle them?')">Handle objections</div>
+            </div>
+            <div class="chat-input-row">
+              <textarea class="chat-input" id="chatInput" placeholder="Ask anything about this account..." rows="1"></textarea>
+              <button class="chat-send-btn" id="chatSendBtn" onclick="sendChat()">➤</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /resultPanels -->
+  </div><!-- /contentArea -->
+</div><!-- /mainArea -->
+
+<script>
+// ── STATE ──
+let API_KEY = '';
+let currentData = null;
+let chatHistory = [];
+
+// Avatar colors cycle
+const avColors = ['av-blue','av-purple','av-green','av-orange','av-pink','av-teal'];
+
+// ── API KEY ──
+function checkKey() {
+  const k = sessionStorage.getItem('apex_key');
+  if (k) { API_KEY = k; document.getElementById('apiModal').style.display = 'none'; }
+  else { document.getElementById('apiModal').style.display = 'flex'; }
+}
+function saveKey() {
+  const v = document.getElementById('apiKeyInp').value.trim();
+  const err = document.getElementById('modalErr');
+  if (!v) { err.textContent = 'Please paste your API key.'; err.classList.add('visible'); return; }
+  if (!v.startsWith('sk-ant-')) { err.textContent = 'Key should start with "sk-ant-" — check you copied the full key.'; err.classList.add('visible'); return; }
+  API_KEY = v;
+  sessionStorage.setItem('apex_key', v);
+  document.getElementById('apiModal').style.display = 'none';
+  err.classList.remove('visible');
+}
+function changeKey() {
+  sessionStorage.removeItem('apex_key');
+  API_KEY = '';
+  document.getElementById('apiKeyInp').value = '';
+  document.getElementById('apiModal').style.display = 'flex';
+}
+document.getElementById('apiKeyInp').addEventListener('keydown', e => { if(e.key==='Enter') saveKey(); });
+checkKey();
+
+// ── HELPERS ──
+function toggleSource(el) { el.classList.toggle('active'); }
+function getActiveSources() {
+  return [...document.querySelectorAll('.source-item.active')].map(e => e.dataset.source);
+}
+document.getElementById('companyInput').addEventListener('keydown', e => { if(e.key==='Enter') runSearch(); });
+function loadExample(c) { document.getElementById('companyInput').value = c; runSearch(); }
+
+function showUI(state) {
+  document.getElementById('emptyState').style.display   = state==='empty'   ? 'flex' : 'none';
+  document.getElementById('loadingState').classList.toggle('active', state==='loading');
+  document.getElementById('resultPanels').style.display = state==='results' ? 'block': 'none';
+  document.getElementById('topbar').style.display       = state==='results' ? 'flex' : 'none';
+  document.getElementById('tabNav').style.display       = state==='results' ? 'flex' : 'none';
+  document.getElementById('errorBar').classList.toggle('visible', state==='error');
+}
+
+async function animateSteps() {
+  const steps = ['ls1','ls2','ls3','ls4','ls5'];
+  for(let i=0;i<steps.length;i++){
+    const el = document.getElementById(steps[i]);
+    el.classList.add('active');
+    await new Promise(r=>setTimeout(r,700));
+    el.classList.remove('active');
+    el.classList.add('done');
+  }
+}
+
+function addRecent(company) {
+  const list = document.getElementById('recentList');
+  if(list.querySelector(`[data-co="${company}"]`)) return;
+  const item = document.createElement('div');
+  item.className = 'recent-item'; item.dataset.co = company;
+  item.onclick = ()=>loadExample(company);
+  item.innerHTML = `<span class="recent-icon">🏢</span>${company}`;
+  list.insertBefore(item, list.firstChild);
+  if(list.children.length > 6) list.removeChild(list.lastChild);
+}
+
+// ── MAIN SEARCH ──
+async function runSearch() {
+  const company = document.getElementById('companyInput').value.trim();
+  if(!company) return;
+  const sources = getActiveSources();
+  if(!sources.length) { document.getElementById('errorBar').textContent='Enable at least one source.'; showUI('error'); return; }
+  if(!API_KEY) { document.getElementById('apiModal').style.display='flex'; return; }
+
+  const btn = document.getElementById('searchBtn');
+  btn.disabled = true;
+  ['ls1','ls2','ls3','ls4','ls5'].forEach(s=>{ const e=document.getElementById(s); e.classList.remove('active','done'); });
+  showUI('loading');
+
+  const stepsP = animateSteps();
+
+  const sourceDesc = {
+    linkedin: 'LinkedIn (decision makers: CEO, CTO, CFO, CIO, VP of IT, VP of Operations, Chief Digital Officer — names, titles, LinkedIn URLs, conversation hooks)',
+    news: 'Recent News & Trigger Events (last 90 days — M&A, digital transformation announcements, leadership changes, funding, earnings, compliance news)',
+    financial: 'Financial Data (revenue, growth rate, employee count, funding, market cap, key tech investments)',
+    tenk: 'SEC 10-K highlights (strategic priorities, technology risks, digital transformation goals, content management challenges)'
+  };
+
+  const prompt = `You are a Box Enterprise sales intelligence analyst. Box sells enterprise content management, secure file sharing, external collaboration, e-signature (Box Sign), and integrations with Salesforce, Microsoft 365, Google Workspace, Slack, and hundreds more apps.
+
+Research "${company}" using these sources: ${sources.map(s=>sourceDesc[s]).join('; ')}.
+
+Return ONLY a valid JSON object with no markdown, no backticks, no extra text. Use only straight double quotes. Avoid apostrophes in text values — use alternate wording instead. Keep all string values short and clean.
+
+{
+  "name": "Full company name",
+  "ticker": "TICKER or null",
+  "industry": "Industry",
+  "hq": "City, State",
+  "founded": "Year",
+  "stage": "Public or Private",
+  "description": "One clean sentence about what they do",
+  "opportunityScore": 82,
+  "scoreReason": "One sentence explaining the Box opportunity score",
+  "stats": {
+    "revenue": "$X.XB",
+    "revenueChange": "+XX%",
+    "employees": "XX,XXX",
+    "employeeChange": "+X%",
+    "funding": "Market Cap $XB or $XM raised",
+    "techStack": "Microsoft 365, Salesforce, SAP"
+  },
+  "executives": [
+    {"name": "Full Name", "title": "CEO", "initials": "AB", "linkedin": "linkedin.com/in/handle", "hook": "Recently spoke about digital transformation"},
+    {"name": "Full Name", "title": "CTO", "initials": "CD", "linkedin": "linkedin.com/in/handle", "hook": "Leading cloud-first strategy"},
+    {"name": "Full Name", "title": "CIO", "initials": "EF", "linkedin": "linkedin.com/in/handle", "hook": "Overseeing content modernization"},
+    {"name": "Full Name", "title": "CFO", "initials": "GH", "linkedin": "linkedin.com/in/handle", "hook": "Focus on operational efficiency"},
+    {"name": "Full Name", "title": "Chief Digital Officer", "initials": "IJ", "linkedin": "linkedin.com/in/handle", "hook": "Driving digital transformation"}
+  ],
+  "news": [
+    {"headline": "News headline here", "date": "Mar 2025", "source": "Reuters", "badge": "trigger", "relevance": "Why this creates a Box opportunity"},
+    {"headline": "News headline here", "date": "Feb 2025", "source": "Bloomberg", "badge": "growth", "relevance": "Why this matters for Box"},
+    {"headline": "News headline here", "date": "Jan 2025", "source": "WSJ", "badge": "risk", "relevance": "How Box addresses this risk"},
+    {"headline": "News headline here", "date": "Dec 2024", "source": "TechCrunch", "badge": "neutral", "relevance": "Context for Box conversation"}
+  ],
+  "financials": [
+    {"label": "Revenue Growth", "value": "XX%", "bar": 72, "color": "blue"},
+    {"label": "Gross Margin", "value": "XX%", "bar": 65, "color": "green"},
+    {"label": "R&D Investment", "value": "$XB", "bar": 58, "color": "blue"},
+    {"label": "Digital Spend", "value": "$XM est", "bar": 70, "color": "orange"}
+  ],
+  "tenk": [
+    {"category": "Strategic Priority", "text": "Key initiative from 10-K relevant to Box"},
+    {"category": "Technology Risk", "text": "Tech risk that Box solves"},
+    {"category": "Content Challenge", "text": "Document or content management challenge mentioned"},
+    {"category": "Compliance Need", "text": "Compliance or security requirement mentioned"}
+  ],
+  "painPoints": [
+    {"pain": "Specific content management or collaboration pain point", "source": "Source: 10-K Filing"},
+    {"pain": "Another specific pain point Box addresses", "source": "Source: Earnings Call"},
+    {"pain": "External collaboration or e-signature challenge", "source": "Source: News / LinkedIn"}
+  ],
+  "boxOpportunity": {
+    "summary": "2-3 sentences on why this account is a strong Box opportunity right now",
+    "useCases": ["Content management use case specific to this company", "External collaboration use case", "e-Signature use case", "Integration use case with their tech stack"],
+    "whyNow": "The specific trigger or timing reason to approach now",
+    "competitiveAngle": "What they likely use today and why Box wins"
+  },
+  "opportunityReasons": [
+    "Specific reason 1 why Box fits this account",
+    "Specific reason 2",
+    "Specific reason 3"
+  ]
+}`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': API_KEY,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 4000,
+        tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const data = await resp.json();
+    if(!resp.ok) throw new Error(data.error?.message || 'API error');
+
+    const fullText = data.content.map(i=>i.type==='text'?i.text:'').filter(Boolean).join('');
+
+    // Robust parse
+    let parsed;
+    try {
+      let clean = fullText.replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
+      const s = clean.indexOf('{'), e = clean.lastIndexOf('}');
+      if(s!==-1 && e!==-1) clean = clean.slice(s, e+1);
+      clean = clean.replace(/[\u2018\u2019]/g,"'").replace(/[\u201C\u201D]/g,'"');
+      clean = clean.replace(/[\x00-\x09\x0b\x0c\x0e-\x1f]/g,' ');
+      try { parsed = JSON.parse(clean); }
+      catch(e2) {
+        clean = clean.replace(/[^\x20-\x7E\n\r\t]/g,' ');
+        parsed = JSON.parse(clean);
+      }
+    } catch(e) {
+      console.error('Parse error:', e, fullText);
+      throw new Error('The AI returned unexpected data. Please try again — it usually works on the second attempt!');
+    }
+
+    currentData = parsed;
+    chatHistory = [];
+
+    await stepsP;
+    renderAll(parsed, sources);
+    showUI('results');
+    addRecent(company);
+
+  } catch(err) {
+    await stepsP;
+    document.getElementById('errorBar').textContent = '⚠ ' + (err.message||'Something went wrong. Please try again.');
+    showUI('error');
+    console.error(err);
+  }
+  btn.disabled = false;
+}
+
+// ── RENDER ──
+function renderAll(d, sources) {
+  const s = d.stats || {};
+  const score = d.opportunityScore || 0;
+  const scoreClass = score >= 75 ? 'high' : score >= 50 ? 'med' : 'low';
+
+  // Topbar
+  document.getElementById('topbarName').textContent = d.name || '—';
+  document.getElementById('topbarMeta').textContent = `${d.industry||''} · ${d.hq||''} · ${d.stage||''} · Est. ${d.founded||'—'}`;
+  const sb = document.getElementById('scoreBadge');
+  sb.textContent = `Box Opportunity: ${score}/100`;
+  sb.className = `score-badge ${scoreClass}`;
+
+  // Stats row
+  const statsRow = document.getElementById('statsRow');
+  const statsData = [
+    {val: s.revenue||'—', lbl:'Revenue', chg: s.revenueChange||'', up:true},
+    {val: s.employees||'—', lbl:'Employees', chg: s.employeeChange||'', up:true},
+    {val: s.funding||'—', lbl:'Funding / Market Cap', chg:'', up:true},
+    {val: s.techStack||'—', lbl:'Key Tech Stack', chg:'', up:true, small:true},
+  ];
+  statsRow.innerHTML = statsData.map(s=>`
+    <div class="stat-card">
+      <div class="stat-val" style="${s.small?'font-size:15px;line-height:1.4':''}">${s.val}</div>
+      <div class="stat-lbl">${s.lbl}</div>
+      ${s.chg ? `<div class="stat-chg up">${s.chg}</div>` : ''}
+    </div>
+  `).join('');
+
+  // Overview grid
+  const og = document.getElementById('overviewGrid');
+  let ogHTML = '';
+  if(sources.includes('linkedin')) {
+    ogHTML += `<div class="card">
+      <div class="card-title"><div class="card-title-dot"></div>Key Decision Makers</div>
+      ${(d.executives||[]).slice(0,4).map((p,i)=>`
+        <div class="person-row">
+          <div class="avatar ${avColors[i%avColors.length]}">${p.initials||'??'}</div>
+          <div style="flex:1">
+            <div class="person-name-text">${p.name||'Unknown'}</div>
+            <div class="person-title-text">${p.title||''}</div>
+            <div class="person-hook">${p.hook||''}</div>
+          </div>
+          <div class="person-actions">
+            <div class="icon-btn" onclick="window.open('https://${p.linkedin||'linkedin.com'}','_blank')" title="LinkedIn">in</div>
+          </div>
+        </div>
+      `).join('')}
+    </div>`;
+  }
+  if(sources.includes('news')) {
+    ogHTML += `<div class="card">
+      <div class="card-title"><div class="card-title-dot"></div>Latest Triggers</div>
+      ${(d.news||[]).slice(0,4).map(n=>`
+        <div class="news-row">
+          <div class="news-top">
+            <div class="news-headline">${n.headline||''}</div>
+            <span class="badge badge-${n.badge||'neutral'}">${(n.badge||'').toUpperCase()}</span>
+          </div>
+          <div class="news-relevance">↳ ${n.relevance||''}</div>
+          <div class="news-meta-row"><span>${n.source||''}</span><span>${n.date||''}</span></div>
+        </div>
+      `).join('')}
+    </div>`;
+  }
+  if(!ogHTML) ogHTML = `<div class="card col-span-2"><div style="color:var(--muted);font-size:14px;text-align:center;padding:32px">Enable LinkedIn or News sources for overview data</div></div>`;
+  og.innerHTML = ogHTML;
+
+  // People tab
+  document.getElementById('peopleList').innerHTML = (d.executives||[]).map((p,i)=>`
+    <div class="person-row">
+      <div class="avatar ${avColors[i%avColors.length]}">${p.initials||'??'}</div>
+      <div style="flex:1">
+        <div class="person-name-text">${p.name||'Unknown'}</div>
+        <div class="person-title-text">${p.title||''}</div>
+        <div class="person-hook">${p.hook||''}</div>
+      </div>
+      <div class="person-actions">
+        <div class="icon-btn" onclick="window.open('https://${p.linkedin||'linkedin.com'}','_blank')" title="View LinkedIn">in</div>
+        <div class="icon-btn" onclick="navigator.clipboard.writeText('${(p.name||'').replace(/'/g,'')}')" title="Copy name">⎘</div>
+      </div>
+    </div>
+  `).join('');
+
+  // News tab
+  document.getElementById('newsList').innerHTML = (d.news||[]).map(n=>`
+    <div class="news-row">
+      <div class="news-top">
+        <div class="news-headline">${n.headline||''}</div>
+        <span class="badge badge-${n.badge||'neutral'}">${(n.badge||'').toUpperCase()}</span>
+      </div>
+      <div class="news-relevance">↳ ${n.relevance||''}</div>
+      <div class="news-meta-row"><span>${n.source||''}</span><span>${n.date||''}</span></div>
+    </div>
+  `).join('');
+
+  // Financials tab
+  const fg = document.getElementById('finGrid');
+  fg.innerHTML = `
+    <div class="card">
+      <div class="card-title"><div class="card-title-dot"></div>Financial Metrics</div>
+      ${(d.financials||[]).map(f=>`
+        <div class="chart-bar-row">
+          <div class="chart-bar-top"><span class="lbl">${f.label||''}</span><span class="val">${f.value||''}</span></div>
+          <div class="bar-track"><div class="bar-fill ${f.color==='green'?'green':f.color==='orange'?'orange':''}" style="width:0%" data-w="${f.bar||0}%"></div></div>
+        </div>
+      `).join('')}
+    </div>
+    <div class="card">
+      <div class="card-title"><div class="card-title-dot"></div>Company Snapshot</div>
+      ${[
+        ['Revenue / ARR', s.revenue],
+        ['YoY Growth', s.revenueChange],
+        ['Total Employees', s.employees],
+        ['Headcount Growth', s.employeeChange],
+        ['Funding / Market Cap', s.funding],
+        ['Known Tech Stack', s.techStack],
+      ].map(([lbl,val])=>`
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+          <span style="font-size:12px;color:var(--muted);font-weight:500">${lbl}</span>
+          <span style="font-size:13px;color:var(--text);font-weight:600;text-align:right;max-width:55%">${val||'—'}</span>
+        </div>
+      `).join('')}
+      <div style="margin-top:16px;">
+        <div class="card-title" style="margin-bottom:12px"><div class="card-title-dot"></div>Pain Points</div>
+        ${(d.painPoints||[]).map((p,i)=>`
+          <div class="pain-item">
+            <div class="pain-num">0${i+1}</div>
+            <div><div class="pain-text">${p.pain||''}</div><div class="pain-src">${p.source||''}</div></div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+  // Animate bars
+  setTimeout(()=>{
+    document.querySelectorAll('.bar-fill').forEach(el=>{
+      el.style.width = el.dataset.w || '0%';
+    });
+  }, 100);
+
+  // 10-K tab
+  document.getElementById('tenkGrid').innerHTML = (d.tenk||[]).map(t=>`
+    <div class="tenk-item">
+      <div class="tenk-cat">${t.category||''}</div>
+      <div class="tenk-text">"${t.text||''}"</div>
+    </div>
+  `).join('');
+
+  // Box Opportunity tab
+  const bo = d.boxOpportunity || {};
+  document.getElementById('boxOppContent').innerHTML = `
+    <div class="opp-score-big">
+      <div class="opp-score-num">${score}</div>
+      <div class="opp-score-lbl">Box Opportunity Score / 100</div>
+    </div>
+    <p style="font-size:13px;color:var(--text2);line-height:1.8;margin-bottom:16px">${bo.summary||d.scoreReason||''}</p>
+
+    <div class="card-title" style="margin-bottom:10px"><div class="card-title-dot"></div>Box Use Cases For This Account</div>
+    ${(bo.useCases||d.opportunityReasons||[]).map(uc=>`
+      <div class="opp-reason-item">
+        <span class="opp-arrow">→</span>
+        <span class="opp-reason-text">${uc}</span>
+      </div>
+    `).join('')}
+
+    ${bo.whyNow ? `
+    <div class="card-title" style="margin:16px 0 10px"><div class="card-title-dot"></div>Why Approach Now</div>
+    <div style="padding:14px;background:var(--accent-light);border-radius:10px;font-size:13px;color:var(--accent);line-height:1.7;font-weight:500">${bo.whyNow}</div>` : ''}
+
+    ${bo.competitiveAngle ? `
+    <div class="card-title" style="margin:16px 0 10px"><div class="card-title-dot"></div>Competitive Angle</div>
+    <div style="padding:14px;background:var(--surface2);border-radius:10px;font-size:13px;color:var(--text2);line-height:1.7">${bo.competitiveAngle}</div>` : ''}
+  `;
+
+  // Reset chat
+  chatHistory = [];
+  document.getElementById('chatMessages').innerHTML = `
+    <div class="msg ai">
+      <div class="msg-avatar ai">AI</div>
+      <div class="msg-bubble">I have the full intelligence on <strong>${d.name}</strong> loaded. Ask me anything about this account — why they need Box, who to contact, how to write a cold email, or how to handle objections. What would you like to know?</div>
+    </div>
+  `;
+}
+
+// ── TABS ──
+function switchTab(id, el) {
+  document.querySelectorAll('.tab-btn').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('panel-'+id).classList.add('active');
+}
+
+// ── CHAT ──
+document.getElementById('chatInput').addEventListener('keydown', e => {
+  if(e.key==='Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); }
+});
+
+function askQuick(q) {
+  document.getElementById('chatInput').value = q;
+  sendChat();
+}
+
+function addMsg(role, text, isTyping=false) {
+  const msgs = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = `msg ${role==='user'?'user':'ai'}`;
+  div.id = isTyping ? 'typingMsg' : '';
+  div.innerHTML = `
+    <div class="msg-avatar ${role==='user'?'user-av':'ai'}">${role==='user'?'You':'AI'}</div>
+    <div class="msg-bubble ${isTyping?'typing':''}">
+      ${isTyping ? '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>' : text}
+    </div>
+  `;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return div;
+}
+
+async function sendChat() {
+  const input = document.getElementById('chatInput');
+  const q = input.value.trim();
+  if(!q || !currentData) return;
+  if(!API_KEY) { document.getElementById('apiModal').style.display='flex'; return; }
+
+  input.value = '';
+  document.getElementById('chatSendBtn').disabled = true;
+
+  addMsg('user', q);
+  const typingEl = addMsg('ai', '', true);
+
+  chatHistory.push({ role: 'user', content: q });
+
+  const systemPrompt = `You are a Box Enterprise sales expert helping a Box Account Executive. 
+You have detailed intelligence on ${currentData.name||'this company'}:
+- Industry: ${currentData.industry||''}
+- Description: ${currentData.description||''}  
+- Employees: ${(currentData.stats||{}).employees||''}
+- Revenue: ${(currentData.stats||{}).revenue||''}
+- Tech Stack: ${(currentData.stats||{}).techStack||''}
+- Key Executives: ${(currentData.executives||[]).map(e=>e.name+' ('+e.title+')').join(', ')}
+- Pain Points: ${(currentData.painPoints||[]).map(p=>p.pain).join('; ')}
+- Recent News: ${(currentData.news||[]).map(n=>n.headline).join('; ')}
+- Box Opportunity: ${((currentData.boxOpportunity)||{}).summary||(currentData.scoreReason||'')}
+- Why Box fits: ${(currentData.opportunityReasons||[]).join('; ')}
+
+Box sells: Enterprise Content Management, secure file sharing, external collaboration, Box Sign (e-signature), and 1500+ integrations including Salesforce, Microsoft 365, Google Workspace, Slack, SAP, Workday, DocuSign, and more.
+
+Give sharp, specific, actionable answers. For cold emails: write a complete ready-to-send email with subject line. For talking points: give 5 numbered bullets. Be concise and sales-focused.`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': API_KEY,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: chatHistory
+      })
+    });
+
+    const data = await resp.json();
+    if(!resp.ok) throw new Error(data.error?.message||'API error');
+
+    const reply = data.content.map(i=>i.type==='text'?i.text:'').join('').trim();
+    chatHistory.push({ role: 'assistant', content: reply });
+
+    // Replace typing with real answer — format nicely
+    const formatted = reply
+      .replace(/\n\n/g, '<br><br>')
+      .replace(/\n/g, '<br>')
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/^(\d+\. )/gm, '<br>$1');
+
+    typingEl.querySelector('.msg-bubble').classList.remove('typing');
+    typingEl.querySelector('.msg-bubble').innerHTML = formatted;
+
+  } catch(err) {
+    typingEl.querySelector('.msg-bubble').classList.remove('typing');
+    typingEl.querySelector('.msg-bubble').textContent = 'Sorry, something went wrong. Please try again.';
+    chatHistory.pop();
+  }
+
+  document.getElementById('chatSendBtn').disabled = false;
+  document.getElementById('chatMessages').scrollTop = 9999;
+}
+</script>
+</body>
+</html>
